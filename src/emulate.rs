@@ -273,11 +273,13 @@ fn execute(state: &mut EmulatorState, instr: Instruction) {
         Instruction::Mul(rtype) => exec_mul(state, rtype),
         Instruction::Div(rtype) => exec_div(state, rtype),
         Instruction::Divu(rtype) => exec_divu(state, rtype),
+        Instruction::Rem(rtype) => exec_rem(state, rtype),
         Instruction::Remu(rtype) => exec_remu(state, rtype),
         Instruction::Addw(rtype) => exec_addw(state, rtype),
         Instruction::Subw(rtype) => exec_subw(state, rtype),
         Instruction::Sllw(rtype) => exec_sllw(state, rtype),
         Instruction::Mulw(rtype) => exec_mulw(state, rtype),
+        Instruction::Divw(rtype) => exec_divw(state, rtype),
         Instruction::Ecall(_itype) => exec_ecall(state),
         // TODO: Cover all needed instructions here.
         _ => unimplemented!("not implemented: {:?}", instr),
@@ -803,14 +805,26 @@ fn exec_mulw(state: &mut EmulatorState, rtype: RType) {
     state.pc_next();
 }
 
-// rd = rs1 /s rs2
+// rd = rs1 / rs2
 // pc = pc + 4
 fn exec_div(state: &mut EmulatorState, rtype: RType) {
     let rs1_value = state.get_reg(rtype.rs1());
     let rs2_value = state.get_reg(rtype.rs2());
     assert!(rs2_value != 0, "check for non-zero divisor");
     let rd_value = (rs1_value as i64).wrapping_div(rs2_value as i64) as u64;
-    trace_rtype(state, "divu", rtype, rd_value);
+    trace_rtype(state, "div", rtype, rd_value);
+    state.set_reg(rtype.rd(), rd_value);
+    state.pc_next();
+}
+
+// rd = s64(rs1{32} / rs2{32})
+// pc = pc + 4
+fn exec_divw(state: &mut EmulatorState, rtype: RType) {
+    let rs1_value = state.get_reg(rtype.rs1());
+    let rs2_value = state.get_reg(rtype.rs2());
+    assert!(rs2_value != 0, "check for non-zero divisor");
+    let rd_value = (rs1_value as i32).wrapping_div(rs2_value as i32) as u64;
+    trace_rtype(state, "divw", rtype, rd_value);
     state.set_reg(rtype.rd(), rd_value);
     state.pc_next();
 }
@@ -823,6 +837,18 @@ fn exec_divu(state: &mut EmulatorState, rtype: RType) {
     assert!(rs2_value != 0, "check for non-zero divisor");
     let rd_value = rs1_value.wrapping_div(rs2_value);
     trace_rtype(state, "divu", rtype, rd_value);
+    state.set_reg(rtype.rd(), rd_value);
+    state.pc_next();
+}
+
+// rd = rs1 % rs2
+// pc = pc + 4
+fn exec_rem(state: &mut EmulatorState, rtype: RType) {
+    let rs1_value = state.get_reg(rtype.rs1());
+    let rs2_value = state.get_reg(rtype.rs2());
+    assert!(rs2_value != 0, "check for non-zero divisor");
+    let rd_value = (rs1_value  as i64).wrapping_rem(rs2_value  as i64)  as u64;
+    trace_rtype(state, "rem", rtype, rd_value);
     state.set_reg(rtype.rd(), rd_value);
     state.pc_next();
 }
