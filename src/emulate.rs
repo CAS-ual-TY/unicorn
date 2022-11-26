@@ -265,6 +265,7 @@ fn execute(state: &mut EmulatorState, instr: Instruction) {
         Instruction::Add(rtype) => exec_add(state, rtype),
         Instruction::Sub(rtype) => exec_sub(state, rtype),
         Instruction::Sll(rtype) => exec_sll(state, rtype),
+        Instruction::Slt(rtype) => exec_slt(state, rtype),
         Instruction::Sltu(rtype) => exec_sltu(state, rtype),
         Instruction::Srl(rtype) => exec_srl(state, rtype),
         Instruction::Sra(rtype) => exec_sra(state, rtype),
@@ -744,6 +745,19 @@ fn exec_sra(state: &mut EmulatorState, rtype: RType) {
     let rs2_value = state.get_reg(rtype.rs2());
     let rd_value = (rs1_value as i64).wrapping_shr(rs2_value as u32) as u64;
     trace_rtype(state, "sra", rtype, rd_value);
+    state.set_reg(rtype.rd(), rd_value);
+    state.pc_next();
+}
+
+// rd = 1                     ||| if (rs1 < rs2)
+// rd = 0                     ||| otherwise
+// pc = pc + 4
+fn exec_slt(state: &mut EmulatorState, rtype: RType) {
+    let rs1_value = state.get_reg(rtype.rs1());
+    let rs2_value = state.get_reg(rtype.rs2());
+    let condition = (rs1_value as i64) < (rs2_value as i64);
+    let rd_value = EmulatorValue::from(condition);
+    trace_rtype(state, "slt", rtype, rd_value);
     state.set_reg(rtype.rd(), rd_value);
     state.pc_next();
 }
