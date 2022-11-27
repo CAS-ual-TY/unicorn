@@ -10,6 +10,9 @@ pub enum SyscallId {
     Write = 64,
     Openat = 56,
     Brk = 214,
+    Close = 57,
+    Lseek = 62,
+    Newfstat = 80
 }
 
 // Prepares arguments on the stack like a UNIX system. Note that we
