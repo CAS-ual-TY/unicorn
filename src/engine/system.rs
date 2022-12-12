@@ -8,6 +8,7 @@ pub enum SyscallId {
     Exit = 93,
     Read = 63,
     Write = 64,
+    Open = 1024,
     Openat = 56,
     Brk = 214,
     Close = 57,

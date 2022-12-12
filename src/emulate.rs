@@ -904,6 +904,8 @@ fn exec_ecall(state: &mut EmulatorState) {
         syscall_read(state);
     } else if a7_value == SyscallId::Write as u64 {
         syscall_write(state);
+	} else if a7_value == SyscallId::Open as u64 {
+		syscall_open(state);
     } else if a7_value == SyscallId::Openat as u64 {
         syscall_openat(state);
     } else if a7_value == SyscallId::Brk as u64 {
@@ -970,6 +972,26 @@ fn syscall_write(state: &mut EmulatorState) {
 
     state.set_reg(Register::A0, result);
     debug!("write({},{:#x},{}) -> {}", fd, buffer, size, result);
+}
+
+fn syscall_open(state: &mut EmulatorState) {
+    let path = state.get_reg(Register::A0);
+    let flag = state.get_reg(Register::A1);
+    let mode = state.get_reg(Register::A2);
+    let temp = state.get_reg(Register::A3);
+
+    // TODO Set fd to AT_FDCWD
+    // state.set_reg(Register::A0, AT_FDCWD);
+    state.set_reg(Register::A1, path);
+    state.set_reg(Register::A2, flag);
+    state.set_reg(Register::A3, mode);
+
+    syscall_openat(state);
+
+    // needed?
+    state.set_reg(Register::A1, flag);
+    state.set_reg(Register::A2, mode);
+    state.set_reg(Register::A3, temp);
 }
 
 fn syscall_openat(state: &mut EmulatorState) {
