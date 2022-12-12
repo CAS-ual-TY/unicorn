@@ -910,6 +910,10 @@ fn exec_ecall(state: &mut EmulatorState) {
         syscall_openat(state);
     } else if a7_value == SyscallId::Brk as u64 {
         syscall_brk(state);
+    } else if a7_value == SyscallId::Close as u64 {
+        // TODO close system call
+    } else if a7_value == SyscallId::Newfstat as u64 {
+        // TODO newfstat system call
     } else {
         warn!("unknown system call: {}", a7_value);
         state.set_reg(Register::A0, u64::MAX);
