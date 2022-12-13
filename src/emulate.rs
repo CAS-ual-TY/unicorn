@@ -904,8 +904,8 @@ fn exec_ecall(state: &mut EmulatorState) {
         syscall_read(state);
     } else if a7_value == SyscallId::Write as u64 {
         syscall_write(state);
-	} else if a7_value == SyscallId::Open as u64 {
-		syscall_open(state);
+    } else if a7_value == SyscallId::Open as u64 {
+        syscall_open(state);
     } else if a7_value == SyscallId::Openat as u64 {
         syscall_openat(state);
     } else if a7_value == SyscallId::Brk as u64 {
